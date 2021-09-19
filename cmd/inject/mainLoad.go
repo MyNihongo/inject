@@ -34,7 +34,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (map[string]injec
 				continue
 			}
 
-			if text := scanner.Text(); text == "}" {
+			if text := strings.TrimSpace(scanner.Text()); text == "}" {
 				return injections, nil
 			} else {
 				// TODO: support utf8?
@@ -65,7 +65,12 @@ func loadFileContent(ctx context.Context, wd, fileName string) (map[string]injec
 
 						// current block ended
 						if bracketsLevel == 0 {
-							injections[sb.String()] = injectType
+							decl := sb.String()
+							if lastIndex := len(decl) - 1; decl[lastIndex] == ',' {
+								decl = decl[0:lastIndex]
+							}
+
+							injections[decl] = injectType
 							sb.Reset()
 							injectType = notSet
 						} else {

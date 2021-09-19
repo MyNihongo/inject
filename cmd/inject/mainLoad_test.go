@@ -26,6 +26,7 @@ func TestLoadLineSplit(t *testing.T) {
 	fileNames := []string{
 		"line_split",
 		"inline",
+		"arg_split",
 	}
 
 	for _, fileName := range fileNames {
