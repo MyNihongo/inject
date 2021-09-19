@@ -15,9 +15,11 @@ func getFilePath(fileName string) string {
 }
 
 func TestLoadLineSplit(t *testing.T) {
-	want := map[string]injectType{
-		"pkg1.GetService1": Singleton,
-		"pkg2.GetService2": Transient,
+	want := &loadResult{
+		injects: map[string]injectType{
+			"pkg1.GetService1": Singleton,
+			"pkg2.GetService2": Transient,
+		},
 	}
 
 	ctx := context.Background()

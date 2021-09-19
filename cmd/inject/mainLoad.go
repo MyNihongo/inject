@@ -9,10 +9,16 @@ import (
 	"strings"
 )
 
+type loadResult struct {
+	injects map[string]injectType
+}
+
 // loadFileContent loads the container definition
-func loadFileContent(ctx context.Context, wd, fileName string) (map[string]injectType, error) {
+func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, error) {
 	filePath := path.Join(wd, fileName)
-	injections := make(map[string]injectType)
+	injections := &loadResult{
+		injects: make(map[string]injectType),
+	}
 
 	if file, err := os.Open(filePath); err != nil {
 		return nil, err
@@ -70,7 +76,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (map[string]injec
 								decl = decl[0:lastIndex]
 							}
 
-							injections[decl] = injectType
+							injections.injects[decl] = injectType
 							sb.Reset()
 							injectType = notSet
 						} else {
