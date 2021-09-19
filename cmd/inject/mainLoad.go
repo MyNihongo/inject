@@ -34,7 +34,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (map[string]injec
 				continue
 			}
 
-			if text := strings.TrimSpace(scanner.Text()); text == "}" {
+			if text := scanner.Text(); text == "}" {
 				return injections, nil
 			} else {
 				// TODO: support utf8?
