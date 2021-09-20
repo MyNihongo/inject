@@ -1,0 +1,8 @@
+//go:generate inject
+package examples
+
+import "github.com/MyNihongo/inject/examples/pkg1"
+
+func BuildServiceProvider() {
+	inject.NewServiceCollection()
+}

@@ -143,11 +143,17 @@ func hasPrefix(text, prefix string, startIndex int) (int, bool) {
 func createImportStmt(text string) *importStmt {
 	for i := 0; i < len(text); i++ {
 		if text[i] == '"' {
-			return &importStmt{
-				alias: strings.TrimSpace(text[:i]),
-				path: strings.TrimFunc(text[i+1:], func(r rune) bool {
-					return r == ' ' || r == '"'
-				}),
+			path := strings.TrimFunc(text[i+1:], func(r rune) bool {
+				return r == ' ' || r == '"'
+			})
+
+			if path == "github.com/MyNihongo/inject" {
+				return nil
+			} else {
+				return &importStmt{
+					alias: strings.TrimSpace(text[:i]),
+					path:  path,
+				}
 			}
 		}
 	}
