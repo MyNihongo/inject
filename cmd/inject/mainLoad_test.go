@@ -16,6 +16,11 @@ func getFilePath(fileName string) string {
 
 func TestLoadLineSplit(t *testing.T) {
 	want := &loadResult{
+		imports: []*importStmt{
+			{path: "github.com/MyNihongo/inject"},
+			{path: "github.com/MyNihongo/inject/examples/pkg1"},
+			{path: "github.com/MyNihongo/inject/examples/pkg2"},
+		},
 		injects: map[string]injectType{
 			"pkg1.GetService1": Singleton,
 			"pkg2.GetService2": Transient,
@@ -26,9 +31,9 @@ func TestLoadLineSplit(t *testing.T) {
 	wd, _ := os.Getwd()
 
 	fileNames := []string{
-		"line_split",
-		"inline",
-		"arg_split",
+		"func_line_split",
+		"func_inline",
+		"func_arg_split",
 	}
 
 	for _, fileName := range fileNames {
