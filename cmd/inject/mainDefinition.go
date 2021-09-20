@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"go/types"
 	"strings"
+
+	"golang.org/x/tools/go/packages"
 )
 
 type injectDecl struct {
@@ -10,8 +14,27 @@ type injectDecl struct {
 	injectType injectType
 }
 
-func getDefinitions(loaded *loadResult) {
-	// mapping := make(map[string]string)
+func getDefinitions(ctx context.Context, wd string, loaded *loadResult) error {
+	if grouping, err := getInjectionGrouping(loaded); err != nil {
+		return err
+	} else {
+		for pkgImport, injections := range grouping {
+			if scope, err := loadPackage(ctx, wd, pkgImport); err != nil {
+				return err
+			} else {
+				for _, injection := range injections {
+					if typeObj := scope.Lookup(injection.function); typeObj == nil {
+						return fmt.Errorf("cannot find a func %s in the package %s", injection.function, pkgImport)
+					} else if funcDecl, ok := typeObj.(*types.Func); !ok {
+						return fmt.Errorf("%s is not a function", injection.function)
+					} else {
+					}
+				}
+			}
+		}
+
+		return nil
+	}
 }
 
 // getInjectionGrouping creates a grouping of injection calles by their packages
@@ -47,4 +70,20 @@ func getInjectionGrouping(loaded *loadResult) (map[string][]*injectDecl, error) 
 	}
 
 	return grouping, nil
+}
+
+func loadPackage(ctx context.Context, wd, pkgImport string) (*types.Scope, error) {
+	cfg := &packages.Config{
+		Context: ctx,
+		Dir:     wd,
+		Mode:    packages.NeedTypes,
+	}
+
+	if pkgs, err := packages.Load(cfg, pkgImport); err != nil {
+		return nil, err
+	} else if len(pkgs) != 1 {
+		return nil, fmt.Errorf("cannot resolve a single package for %s. Count: %d", pkgImport, len(pkgs))
+	} else {
+		return pkgs[0].Types.Scope(), nil
+	}
 }

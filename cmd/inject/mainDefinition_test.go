@@ -1,10 +1,22 @@
 package main
 
 import (
+	"context"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func getExamplesWd() string {
+	wd, _ := os.Getwd()
+	cmdDir := filepath.Join("cmd", "inject")
+
+	dirIndex := strings.LastIndex(wd, cmdDir)
+	return filepath.Join(wd[:dirIndex], "examples")
+}
 
 func TestGroupingSamePackageOne(t *testing.T) {
 	want := map[string][]*injectDecl{
@@ -142,4 +154,10 @@ func TestGroupingErrorIfNoImport(t *testing.T) {
 
 	assert.Nil(t, got)
 	assert.Error(t, err, "package import for pkg not found")
+}
+
+func TestDefinitions(t *testing.T) {
+	ctx, wd := context.Background(), getExamplesWd()
+	fixture, _ := loadFileContent(wd, "serviceCollection.go")
+	getDefinitions(ctx, wd, fixture)
 }

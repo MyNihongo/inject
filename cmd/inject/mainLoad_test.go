@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path"
@@ -27,7 +26,6 @@ func TestLoadLineSplit(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
 	wd, _ := os.Getwd()
 
 	fileNames := []string{
@@ -38,7 +36,7 @@ func TestLoadLineSplit(t *testing.T) {
 
 	for _, fileName := range fileNames {
 		filePath := getFilePath(fileName)
-		mapping, err := loadFileContent(ctx, wd, filePath)
+		mapping, err := loadFileContent(wd, filePath)
 
 		assert.Nil(t, err)
 		assert.Equal(t, want, mapping)
@@ -55,9 +53,9 @@ func TestLoadImportSingle(t *testing.T) {
 	}
 
 	wd, _ := os.Getwd()
-	ctx, filePath := context.Background(), getFilePath("import_single")
+	filePath := getFilePath("import_single")
 
-	mapping, err := loadFileContent(ctx, wd, filePath)
+	mapping, err := loadFileContent(wd, filePath)
 
 	assert.Nil(t, err)
 	assert.Equal(t, want, mapping)
@@ -73,9 +71,9 @@ func TestLoadImportSingleAlias(t *testing.T) {
 	}
 
 	wd, _ := os.Getwd()
-	ctx, filePath := context.Background(), getFilePath("import_single_alias")
+	filePath := getFilePath("import_single_alias")
 
-	mapping, err := loadFileContent(ctx, wd, filePath)
+	mapping, err := loadFileContent(wd, filePath)
 
 	assert.Nil(t, err)
 	assert.Equal(t, want, mapping)
@@ -92,9 +90,9 @@ func TestLoadImportMultiline(t *testing.T) {
 	}
 
 	wd, _ := os.Getwd()
-	ctx, filePath := context.Background(), getFilePath("import_multiline")
+	filePath := getFilePath("import_multiline")
 
-	mapping, err := loadFileContent(ctx, wd, filePath)
+	mapping, err := loadFileContent(wd, filePath)
 
 	assert.Nil(t, err)
 	assert.Equal(t, want, mapping)

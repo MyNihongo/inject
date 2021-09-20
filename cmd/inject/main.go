@@ -19,10 +19,10 @@ func main() {
 		fmt.Print(err)
 	} else {
 		ctx := context.Background()
-		if loaded, err := loadFileContent(ctx, wd, "serviceCollection.go"); err != nil {
+		if loaded, err := loadFileContent(wd, "serviceCollection.go"); err != nil {
 			fmt.Print(err)
 		} else {
-			getDefinitions(loaded)
+			getDefinitions(ctx, wd, loaded)
 		}
 	}
 }

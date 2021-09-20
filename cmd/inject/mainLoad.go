@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"errors"
 	"os"
 	"path"
@@ -21,7 +20,7 @@ type importStmt struct {
 }
 
 // loadFileContent loads the container definition
-func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, error) {
+func loadFileContent(wd, fileName string) (*loadResult, error) {
 	filePath := path.Join(wd, fileName)
 	injections := &loadResult{
 		imports: make(map[string]string),
