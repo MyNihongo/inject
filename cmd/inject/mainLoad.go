@@ -40,6 +40,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, err
 		var sb strings.Builder
 
 		for scanner.Scan() {
+			// process miscellaneous stuff
 			if !isFuncFound {
 				const pkgDecl, importDecl = "package", "import"
 				if text := strings.TrimSpace(scanner.Text()); strings.EqualFold(text, "func BuildServiceProvider() {") {
@@ -69,6 +70,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, err
 				continue
 			}
 
+			// process injection declarations
 			if text := strings.TrimSpace(scanner.Text()); text == "}" {
 				return injections, nil
 			} else {
