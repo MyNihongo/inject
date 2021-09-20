@@ -17,15 +17,9 @@ func getFilePath(fileName string) string {
 func TestLoadLineSplit(t *testing.T) {
 	want := &loadResult{
 		pkgName: "examples",
-		imports: []*importStmt{
-			{
-				alias: "pkg1",
-				path:  "github.com/MyNihongo/inject/examples/pkg1",
-			},
-			{
-				alias: "pkg2",
-				path:  "github.com/MyNihongo/inject/examples/pkg2",
-			},
+		imports: map[string]string{
+			"pkg1": "github.com/MyNihongo/inject/examples/pkg1",
+			"pkg2": "github.com/MyNihongo/inject/examples/pkg2",
 		},
 		injects: map[string]injectType{
 			"pkg1.GetService1": Singleton,
@@ -54,11 +48,8 @@ func TestLoadLineSplit(t *testing.T) {
 func TestLoadImportSingle(t *testing.T) {
 	want := &loadResult{
 		pkgName: "examples",
-		imports: []*importStmt{
-			{
-				alias: "pkg1",
-				path:  "github.com/MyNihongo/inject/examples/pkg1",
-			},
+		imports: map[string]string{
+			"pkg1": "github.com/MyNihongo/inject/examples/pkg1",
 		},
 		injects: map[string]injectType{},
 	}
@@ -75,11 +66,8 @@ func TestLoadImportSingle(t *testing.T) {
 func TestLoadImportSingleAlias(t *testing.T) {
 	want := &loadResult{
 		pkgName: "examples",
-		imports: []*importStmt{
-			{
-				alias: "my_alias",
-				path:  "github.com/MyNihongo/inject/examples/pkg1",
-			},
+		imports: map[string]string{
+			"my_alias": "github.com/MyNihongo/inject/examples/pkg1",
 		},
 		injects: map[string]injectType{},
 	}
@@ -96,15 +84,9 @@ func TestLoadImportSingleAlias(t *testing.T) {
 func TestLoadImportMultiline(t *testing.T) {
 	want := &loadResult{
 		pkgName: "examples",
-		imports: []*importStmt{
-			{
-				alias: "pkg1",
-				path:  "github.com/MyNihongo/inject/examples/pkg1",
-			},
-			{
-				alias: "my_alias",
-				path:  "github.com/MyNihongo/inject/examples/pkg2",
-			},
+		imports: map[string]string{
+			"pkg1": "github.com/MyNihongo/inject/examples/pkg1",
+			"pkg2": "github.com/MyNihongo/inject/examples/pkg2",
 		},
 		injects: map[string]injectType{},
 	}

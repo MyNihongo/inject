@@ -22,7 +22,7 @@ func main() {
 		if loaded, err := loadFileContent(ctx, wd, "serviceCollection.go"); err != nil {
 			fmt.Print(err)
 		} else {
-			fmt.Println(loaded)
+			getDefinitions(loaded)
 		}
 	}
 }

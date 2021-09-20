@@ -11,7 +11,7 @@ import (
 
 type loadResult struct {
 	pkgName string
-	imports []*importStmt
+	imports map[string]string
 	injects map[string]injectType
 }
 
@@ -24,7 +24,7 @@ type importStmt struct {
 func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, error) {
 	filePath := path.Join(wd, fileName)
 	injections := &loadResult{
-		imports: make([]*importStmt, 0),
+		imports: make(map[string]string),
 		injects: make(map[string]injectType),
 	}
 
@@ -53,7 +53,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, err
 					} else {
 						// block of imports
 						if importStmt := createImportStmt(text); importStmt != nil {
-							injections.imports = append(injections.imports, importStmt)
+							injections.imports[importStmt.alias] = importStmt.path
 						}
 					}
 				} else if len(injections.imports) == 0 && strings.HasPrefix(text, importDecl) {
@@ -62,7 +62,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, err
 					} else {
 						// single import
 						if importStmt := createImportStmt(text[len(importDecl)+1:]); importStmt != nil {
-							injections.imports = append(injections.imports, importStmt)
+							injections.imports[importStmt.alias] = importStmt.path
 						}
 					}
 				}
