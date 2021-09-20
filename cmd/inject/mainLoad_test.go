@@ -85,8 +85,8 @@ func TestLoadImportMultiline(t *testing.T) {
 	want := &loadResult{
 		pkgName: "examples",
 		imports: map[string]string{
-			"pkg1": "github.com/MyNihongo/inject/examples/pkg1",
-			"pkg2": "github.com/MyNihongo/inject/examples/pkg2",
+			"pkg1":     "github.com/MyNihongo/inject/examples/pkg1",
+			"my_alias": "github.com/MyNihongo/inject/examples/pkg2",
 		},
 		injects: map[string]injectType{},
 	}
