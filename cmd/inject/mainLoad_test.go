@@ -18,8 +18,14 @@ func TestLoadLineSplit(t *testing.T) {
 	want := &loadResult{
 		pkgName: "examples",
 		imports: []*importStmt{
-			{path: "github.com/MyNihongo/inject/examples/pkg1"},
-			{path: "github.com/MyNihongo/inject/examples/pkg2"},
+			{
+				alias: "pkg1",
+				path:  "github.com/MyNihongo/inject/examples/pkg1",
+			},
+			{
+				alias: "pkg2",
+				path:  "github.com/MyNihongo/inject/examples/pkg2",
+			},
 		},
 		injects: map[string]injectType{
 			"pkg1.GetService1": Singleton,
@@ -49,7 +55,10 @@ func TestLoadImportSingle(t *testing.T) {
 	want := &loadResult{
 		pkgName: "examples",
 		imports: []*importStmt{
-			{path: "github.com/MyNihongo/inject/examples/pkg1"},
+			{
+				alias: "pkg1",
+				path:  "github.com/MyNihongo/inject/examples/pkg1",
+			},
 		},
 		injects: map[string]injectType{},
 	}
@@ -89,7 +98,8 @@ func TestLoadImportMultiline(t *testing.T) {
 		pkgName: "examples",
 		imports: []*importStmt{
 			{
-				path: "github.com/MyNihongo/inject/examples/pkg1",
+				alias: "pkg1",
+				path:  "github.com/MyNihongo/inject/examples/pkg1",
 			},
 			{
 				alias: "my_alias",
