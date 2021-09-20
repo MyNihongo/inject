@@ -27,7 +27,8 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) error {
 						return fmt.Errorf("cannot find a func %s in the package %s", injection.function, pkgImport)
 					} else if funcDecl, ok := typeObj.(*types.Func); !ok {
 						return fmt.Errorf("%s is not a function", injection.function)
-					} else {
+					} else if signature, ok := funcDecl.Type().(*types.Signature); !ok {
+						return fmt.Errorf("cannot retrieve a signature of %s", injection.function)
 					}
 				}
 			}

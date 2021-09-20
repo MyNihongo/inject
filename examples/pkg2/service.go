@@ -4,11 +4,30 @@ type Service2 interface {
 	Foo()
 }
 
+type InnerService interface {
+	Boo()
+}
+
 type impl struct {
+	innerSrv InnerService
 }
 
-func GetService2() Service2 {
-	return &impl{}
+type innerImpl struct {
 }
 
-func (i *impl) Foo() {}
+func GetInnerService() InnerService {
+	return &innerImpl{}
+}
+
+func GetService2(innerSrv InnerService) Service2 {
+	return &impl{
+		innerSrv: innerSrv,
+	}
+}
+
+func (i *impl) Foo() {
+	i.innerSrv.Boo()
+}
+
+func (i *innerImpl) Boo() {
+}
