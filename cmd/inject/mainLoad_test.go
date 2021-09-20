@@ -16,6 +16,7 @@ func getFilePath(fileName string) string {
 
 func TestLoadLineSplit(t *testing.T) {
 	want := &loadResult{
+		pkgName: "examples",
 		imports: []*importStmt{
 			{path: "github.com/MyNihongo/inject"},
 			{path: "github.com/MyNihongo/inject/examples/pkg1"},

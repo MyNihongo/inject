@@ -10,6 +10,7 @@ import (
 )
 
 type loadResult struct {
+	pkgName string
 	imports []*importStmt
 	injects map[string]injectType
 }
@@ -40,15 +41,17 @@ func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, err
 
 		for scanner.Scan() {
 			if !isFuncFound {
-				const importDecl = "import"
+				const pkgDecl, importDecl = "package", "import"
 				if text := strings.TrimSpace(scanner.Text()); strings.EqualFold(text, "func BuildServiceProvider() {") {
 					isFuncFound = true
+				} else if len(injections.pkgName) == 0 && strings.HasPrefix(text, pkgDecl) {
+					injections.pkgName = strings.TrimSpace(text[len(pkgDecl)+1:])
 				} else if areImportsFound {
 					if text == ")" {
 						areImportsFound = false
 					} else {
 						// block of imports
-						if importStmt := createImport(text); importStmt != nil {
+						if importStmt := createImportStmt(text); importStmt != nil {
 							injections.imports = append(injections.imports, importStmt)
 						}
 					}
@@ -57,7 +60,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, err
 						areImportsFound = true
 					} else {
 						// single import
-						if importStmt := createImport(text[len(importDecl)+1:]); importStmt != nil {
+						if importStmt := createImportStmt(text[len(importDecl)+1:]); importStmt != nil {
 							injections.imports = append(injections.imports, importStmt)
 						}
 					}
@@ -123,6 +126,7 @@ func loadFileContent(ctx context.Context, wd, fileName string) (*loadResult, err
 	}
 }
 
+// hasPrefix tests whether the string begins with prefix at the specified index
 func hasPrefix(text, prefix string, startIndex int) (int, bool) {
 	// TODO: support utf8?
 	for i := 0; i < len(prefix) && startIndex+i < len(text); i++ {
@@ -135,7 +139,8 @@ func hasPrefix(text, prefix string, startIndex int) (int, bool) {
 	return len(prefix) - 1, true
 }
 
-func createImport(text string) *importStmt {
+// createImportStmt tries to parse an import statement from the string
+func createImportStmt(text string) *importStmt {
 	for i := 0; i < len(text); i++ {
 		if text[i] == '"' {
 			return &importStmt{
