@@ -168,7 +168,49 @@ func TestGetTypeDeclaration(t *testing.T) {
 }
 
 func TestDefinitions(t *testing.T) {
+	want := map[string]map[string]*funcDecl{
+		"github.com/MyNihongo/inject/examples/pkg1": {
+			"Service1": {
+				name:       "GetService1",
+				paramTypes: []*typeDecl{},
+				injectType: Singleton,
+			},
+		},
+		"github.com/MyNihongo/inject/examples/pkg2": {
+			"Service2": {
+				name: "GetService2",
+				paramTypes: []*typeDecl{
+					{
+						pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
+						typeName:  "InnerService",
+					},
+					{
+						pkgImport: "github.com/MyNihongo/inject/examples/pkg3",
+						typeName:  "Service3",
+					},
+				},
+				injectType: Transient,
+			},
+			"InnerService": {
+				name:       "GetInnerService",
+				paramTypes: []*typeDecl{},
+				injectType: Transient,
+			},
+		},
+		"github.com/MyNihongo/inject/examples/pkg3": {
+			"Service3": {
+				name:       "GetService3",
+				paramTypes: []*typeDecl{},
+				injectType: Transient,
+			},
+		},
+	}
+
 	ctx, wd := context.Background(), getExamplesWd()
 	fixture, _ := loadFileContent(wd, "serviceCollection.go")
-	getDefinitions(ctx, wd, fixture)
+
+	got, err := getDefinitions(ctx, wd, fixture)
+
+	assert.Nil(t, err)
+	assert.Equal(t, want, got)
 }
