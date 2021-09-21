@@ -15,6 +15,8 @@ type injectDecl struct {
 }
 
 type funcDecl struct {
+	paramTypes []*typeDecl
+	injectType injectType
 }
 
 type typeDecl struct {
@@ -22,46 +24,61 @@ type typeDecl struct {
 	typeName  string
 }
 
-func getDefinitions(ctx context.Context, wd string, loaded *loadResult) error {
-	diDecl := make(map[string]map[string][]*funcDecl)
+func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[string]map[string]*funcDecl, error) {
+	// First key - package import; Second key - return type; Value - function parameters and inject type
+	diDecl := make(map[string]map[string]*funcDecl)
 
 	if grouping, err := getInjectionGrouping(loaded); err != nil {
-		return err
+		return nil, err
 	} else {
 		for pkgImport, injections := range grouping {
 			if scope, err := loadPackage(ctx, wd, pkgImport); err != nil {
-				return err
+				return nil, err
 			} else {
 				for _, injection := range injections {
 					if typeObj := scope.Lookup(injection.function); typeObj == nil {
-						return fmt.Errorf("cannot find a func %s in the package %s", injection.function, pkgImport)
-					} else if funcDecl, ok := typeObj.(*types.Func); !ok {
-						return fmt.Errorf("%s is not a function", injection.function)
-					} else if signature, ok := funcDecl.Type().(*types.Signature); !ok {
-						return fmt.Errorf("cannot retrieve a signature of %s", injection.function)
+						return nil, fmt.Errorf("cannot find a func %s in the package %s", injection.function, pkgImport)
+					} else if funcType, ok := typeObj.(*types.Func); !ok {
+						return nil, fmt.Errorf("%s is not a function", injection.function)
+					} else if signature, ok := funcType.Type().(*types.Signature); !ok {
+						return nil, fmt.Errorf("cannot retrieve a signature of %s", injection.function)
 					} else {
 						// Return types
-						var returnType string
+						var returnType *typeDecl
 						if returnTypes := signature.Results(); returnTypes == nil || returnTypes.Len() != 1 {
-							return fmt.Errorf("func %s does not return a single value", injection.function)
+							return nil, fmt.Errorf("func %s does not return a single value", injection.function)
 						} else {
-							fmt.Println(returnTypes.At(0).Type())
+							returnType = getTypeDeclaration(returnTypes.At(0).Type())
+						}
+
+						var pkgGrouping map[string]*funcDecl
+						if pkgGrouping, ok = diDecl[returnType.pkgImport]; !ok {
+							pkgGrouping = make(map[string]*funcDecl, 1)
+							diDecl[returnType.pkgImport] = pkgGrouping
 						}
 
 						// Params
+						var paramTypes []*typeDecl
 						if params := signature.Params(); params != nil {
+							paramTypes = make([]*typeDecl, params.Len())
 							for i := 0; i < params.Len(); i++ {
-								param := params.At(i)
-
-								fmt.Println(param.Type())
+								t := params.At(i).Type()
+								paramTypes[i] = getTypeDeclaration(t)
 							}
+						} else {
+							paramTypes = make([]*typeDecl, 0)
+						}
+
+						pkgGrouping[returnType.typeName] = &funcDecl{
+							paramTypes: paramTypes,
+							injectType: injection.injectType,
 						}
 					}
 				}
 			}
 		}
 
-		return nil
+		return diDecl, nil
 	}
 }
 
@@ -116,7 +133,7 @@ func loadPackage(ctx context.Context, wd, pkgImport string) (*types.Scope, error
 	}
 }
 
-func getTypeDeclaration(t *types.Type) *typeDecl {
+func getTypeDeclaration(t types.Type) *typeDecl {
 	strVal := fmt.Sprint(t)
 	return getTypeDeclarationString(strVal)
 }
