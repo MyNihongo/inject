@@ -84,7 +84,7 @@ func loadPackage(ctx context.Context, wd, pkgImport string) (*types.Scope, error
 	cfg := &packages.Config{
 		Context: ctx,
 		Dir:     wd,
-		Mode:    packages.NeedTypes,
+		Mode:    packages.NeedTypes | packages.NeedImports,
 	}
 
 	if pkgs, err := packages.Load(cfg, pkgImport); err != nil {

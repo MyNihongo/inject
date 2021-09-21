@@ -1,5 +1,9 @@
 package pkg2
 
+import (
+	"github.com/MyNihongo/inject/examples/pkg3"
+)
+
 type Service2 interface {
 	Foo()
 }
@@ -19,7 +23,7 @@ func GetInnerService() InnerService {
 	return &innerImpl{}
 }
 
-func GetService2(innerSrv InnerService) Service2 {
+func GetService2(innerSrv InnerService, aa pkg3.Service3) Service2 {
 	return &impl{
 		innerSrv: innerSrv,
 	}

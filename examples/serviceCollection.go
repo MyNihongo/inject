@@ -12,5 +12,6 @@ func BuildServiceProvider() {
 	inject.NewServiceCollection().
 		AddSingleton(pkg1.GetService1).
 		AddTransient(pkg2.GetService2).
-		AddSingleton(pkg3.GetService3)
+		AddTransient(pkg2.GetInnerService).
+		AddTransient(pkg3.GetService3)
 }
