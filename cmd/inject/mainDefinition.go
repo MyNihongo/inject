@@ -29,6 +29,12 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) error {
 						return fmt.Errorf("%s is not a function", injection.function)
 					} else if signature, ok := funcDecl.Type().(*types.Signature); !ok {
 						return fmt.Errorf("cannot retrieve a signature of %s", injection.function)
+					} else {
+						params := signature.Params()
+						for i := 0; i < params.Len(); i++ {
+							param := params.At(i)
+							fmt.Println(param.Type())
+						}
 					}
 				}
 			}

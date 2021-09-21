@@ -1,10 +1,10 @@
 package inject
 
-type ServiceCollection interface {
-	AddSingleton(impl interface{}) ServiceCollection
-	AddTransient(impl interface{}) ServiceCollection
+type serviceCollection interface {
+	AddSingleton(impl interface{}) serviceCollection
+	AddTransient(impl interface{}) serviceCollection
 }
 
-func NewServiceCollection() ServiceCollection {
+func NewServiceCollection() serviceCollection {
 	panic("not implemented, run code generation")
 }
