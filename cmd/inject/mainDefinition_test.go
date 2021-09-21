@@ -156,6 +156,17 @@ func TestGroupingErrorIfNoImport(t *testing.T) {
 	assert.Error(t, err, "package import for pkg not found")
 }
 
+func TestGetTypeDeclaration(t *testing.T) {
+	want := &typeDecl{
+		pkgImport: "github.com/MyNihongo/inject/examples/pkg1",
+		typeName:  "Service1",
+	}
+
+	got := getTypeDeclarationString("github.com/MyNihongo/inject/examples/pkg1.Service1")
+
+	assert.Equal(t, want, got)
+}
+
 func TestDefinitions(t *testing.T) {
 	ctx, wd := context.Background(), getExamplesWd()
 	fixture, _ := loadFileContent(wd, "serviceCollection.go")

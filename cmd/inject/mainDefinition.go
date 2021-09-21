@@ -14,7 +14,17 @@ type injectDecl struct {
 	injectType injectType
 }
 
+type funcDecl struct {
+}
+
+type typeDecl struct {
+	pkgImport string
+	typeName  string
+}
+
 func getDefinitions(ctx context.Context, wd string, loaded *loadResult) error {
+	diDecl := make(map[string]map[string][]*funcDecl)
+
 	if grouping, err := getInjectionGrouping(loaded); err != nil {
 		return err
 	} else {
@@ -29,12 +39,22 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) error {
 						return fmt.Errorf("%s is not a function", injection.function)
 					} else if signature, ok := funcDecl.Type().(*types.Signature); !ok {
 						return fmt.Errorf("cannot retrieve a signature of %s", injection.function)
-					} else if params := signature.Params(); params == nil {
-						continue
 					} else {
-						for i := 0; i < params.Len(); i++ {
-							param := params.At(i)
-							fmt.Println(param.Type())
+						// Return types
+						var returnType string
+						if returnTypes := signature.Results(); returnTypes == nil || returnTypes.Len() != 1 {
+							return fmt.Errorf("func %s does not return a single value", injection.function)
+						} else {
+							fmt.Println(returnTypes.At(0).Type())
+						}
+
+						// Params
+						if params := signature.Params(); params != nil {
+							for i := 0; i < params.Len(); i++ {
+								param := params.At(i)
+
+								fmt.Println(param.Type())
+							}
 						}
 					}
 				}
@@ -93,5 +113,19 @@ func loadPackage(ctx context.Context, wd, pkgImport string) (*types.Scope, error
 		return nil, fmt.Errorf("cannot resolve a single package for %s. Count: %d", pkgImport, len(pkgs))
 	} else {
 		return pkgs[0].Types.Scope(), nil
+	}
+}
+
+func getTypeDeclaration(t *types.Type) *typeDecl {
+	strVal := fmt.Sprint(t)
+	return getTypeDeclarationString(strVal)
+}
+
+func getTypeDeclarationString(strVal string) *typeDecl {
+	typeSeparator := strings.LastIndexByte(strVal, '.')
+
+	return &typeDecl{
+		pkgImport: strVal[:typeSeparator],
+		typeName:  strVal[typeSeparator+1:],
 	}
 }
