@@ -14,6 +14,16 @@ type injectDecl struct {
 	injectType injectType
 }
 
+type pkgInjections struct {
+	alias      string
+	injections []*injectDecl
+}
+
+type pkgFuncs struct {
+	alias string
+	funcs map[string]*funcDecl
+}
+
 type funcDecl struct {
 	name       string
 	paramTypes []*typeDecl
@@ -25,18 +35,18 @@ type typeDecl struct {
 	typeName  string
 }
 
-func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[string]map[string]*funcDecl, error) {
+func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[string]*pkgFuncs, error) {
 	// First key - package import; Second key - return type; Value - function parameters and inject type
-	diDecl := make(map[string]map[string]*funcDecl)
+	diDecl := make(map[string]*pkgFuncs)
 
 	if grouping, err := getInjectionGrouping(loaded); err != nil {
 		return nil, err
 	} else {
-		for pkgImport, injections := range grouping {
+		for pkgImport, pkgInjections := range grouping {
 			if scope, err := loadPackage(ctx, wd, pkgImport); err != nil {
 				return nil, err
 			} else {
-				for _, injection := range injections {
+				for _, injection := range pkgInjections.injections {
 					if typeObj := scope.Lookup(injection.function); typeObj == nil {
 						return nil, fmt.Errorf("cannot find a func %s in the package %s", injection.function, pkgImport)
 					} else if funcType, ok := typeObj.(*types.Func); !ok {
@@ -52,9 +62,12 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[str
 							returnType = getTypeDeclaration(returnTypes.At(0).Type())
 						}
 
-						var pkgGrouping map[string]*funcDecl
+						var pkgGrouping *pkgFuncs
 						if pkgGrouping, ok = diDecl[returnType.pkgImport]; !ok {
-							pkgGrouping = make(map[string]*funcDecl, 1)
+							pkgGrouping = &pkgFuncs{
+								alias: pkgInjections.alias,
+								funcs: make(map[string]*funcDecl, 1),
+							}
 							diDecl[returnType.pkgImport] = pkgGrouping
 						}
 
@@ -70,7 +83,7 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[str
 							paramTypes = make([]*typeDecl, 0)
 						}
 
-						pkgGrouping[returnType.typeName] = &funcDecl{
+						pkgGrouping.funcs[returnType.typeName] = &funcDecl{
 							name:       injection.function,
 							paramTypes: paramTypes,
 							injectType: injection.injectType,
@@ -85,19 +98,18 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[str
 }
 
 // getInjectionGrouping creates a grouping of injection calles by their packages
-func getInjectionGrouping(loaded *loadResult) (map[string][]*injectDecl, error) {
-	grouping := make(map[string][]*injectDecl)
+func getInjectionGrouping(loaded *loadResult) (map[string]*pkgInjections, error) {
+	grouping := make(map[string]*pkgInjections)
 
 	for inject, injectType := range loaded.injects {
 		var alias, function, pkgImport string
 		if dotIndex := strings.IndexByte(inject, '.'); dotIndex == -1 {
-			alias, function = loaded.pkgName, inject
-			pkgImport = loaded.pkgName
+			function = inject
 		} else {
 			alias, function = inject[:dotIndex], inject[dotIndex+1:]
 		}
 
-		if len(pkgImport) == 0 {
+		if len(alias) != 0 {
 			var ok bool
 			if pkgImport, ok = loaded.imports[alias]; !ok {
 				return nil, fmt.Errorf("package import for %s not found", alias)
@@ -109,10 +121,13 @@ func getInjectionGrouping(loaded *loadResult) (map[string][]*injectDecl, error) 
 			injectType: injectType,
 		}
 
-		if slice, ok := grouping[pkgImport]; ok {
-			grouping[pkgImport] = append(slice, decl)
+		if pkgInject, ok := grouping[pkgImport]; ok {
+			pkgInject.injections = append(pkgInject.injections, decl)
 		} else {
-			grouping[pkgImport] = []*injectDecl{decl}
+			grouping[pkgImport] = &pkgInjections{
+				alias:      alias,
+				injections: []*injectDecl{decl},
+			}
 		}
 	}
 

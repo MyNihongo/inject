@@ -19,11 +19,14 @@ func getExamplesWd() string {
 }
 
 func TestGroupingSamePackageOne(t *testing.T) {
-	want := map[string][]*injectDecl{
-		"di": {
-			{
-				function:   "createFoo",
-				injectType: Singleton,
+	want := map[string]*pkgInjections{
+		"": {
+			alias: "",
+			injections: []*injectDecl{
+				{
+					function:   "createFoo",
+					injectType: Singleton,
+				},
 			},
 		},
 	}
@@ -43,15 +46,18 @@ func TestGroupingSamePackageOne(t *testing.T) {
 }
 
 func TestGroupingSamePackageMultiple(t *testing.T) {
-	want := map[string][]*injectDecl{
-		"di": {
-			{
-				function:   "createFoo",
-				injectType: Singleton,
-			},
-			{
-				function:   "createBoo",
-				injectType: Transient,
+	want := map[string]*pkgInjections{
+		"": {
+			alias: "",
+			injections: []*injectDecl{
+				{
+					function:   "createFoo",
+					injectType: Singleton,
+				},
+				{
+					function:   "createBoo",
+					injectType: Transient,
+				},
 			},
 		},
 	}
@@ -72,11 +78,14 @@ func TestGroupingSamePackageMultiple(t *testing.T) {
 }
 
 func TestGroupingAnotherPackageOne(t *testing.T) {
-	want := map[string][]*injectDecl{
+	want := map[string]*pkgInjections{
 		"github.com/MyNihongo/inject/examples/pkg1": {
-			{
-				function:   "CreateFoo",
-				injectType: Singleton,
+			alias: "pkg1",
+			injections: []*injectDecl{
+				{
+					function:   "CreateFoo",
+					injectType: Singleton,
+				},
 			},
 		},
 	}
@@ -98,25 +107,31 @@ func TestGroupingAnotherPackageOne(t *testing.T) {
 }
 
 func TestGroupingAnotherPackageMultiple(t *testing.T) {
-	want := map[string][]*injectDecl{
+	want := map[string]*pkgInjections{
 		"github.com/MyNihongo/inject/examples/pkg1": {
-			{
-				function:   "CreateFoo",
-				injectType: Singleton,
-			},
-			{
-				function:   "CreateBoo",
-				injectType: Transient,
+			alias: "my_pkg1",
+			injections: []*injectDecl{
+				{
+					function:   "CreateFoo",
+					injectType: Singleton,
+				},
+				{
+					function:   "CreateBoo",
+					injectType: Transient,
+				},
 			},
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
-			{
-				function:   "CreateFoo",
-				injectType: Transient,
-			},
-			{
-				function:   "CreateBoo",
-				injectType: Singleton,
+			alias: "not_my_pkg2",
+			injections: []*injectDecl{
+				{
+					function:   "CreateFoo",
+					injectType: Transient,
+				},
+				{
+					function:   "CreateBoo",
+					injectType: Singleton,
+				},
 			},
 		},
 	}
@@ -124,14 +139,14 @@ func TestGroupingAnotherPackageMultiple(t *testing.T) {
 	fixture := &loadResult{
 		pkgName: "di",
 		imports: map[string]string{
-			"pkg1": "github.com/MyNihongo/inject/examples/pkg1",
-			"pkg2": "github.com/MyNihongo/inject/examples/pkg2",
+			"my_pkg1":     "github.com/MyNihongo/inject/examples/pkg1",
+			"not_my_pkg2": "github.com/MyNihongo/inject/examples/pkg2",
 		},
 		injects: map[string]injectType{
-			"pkg1.CreateFoo": Singleton,
-			"pkg1.CreateBoo": Transient,
-			"pkg2.CreateFoo": Transient,
-			"pkg2.CreateBoo": Singleton,
+			"my_pkg1.CreateFoo":     Singleton,
+			"my_pkg1.CreateBoo":     Transient,
+			"not_my_pkg2.CreateFoo": Transient,
+			"not_my_pkg2.CreateBoo": Singleton,
 		},
 	}
 
@@ -168,40 +183,49 @@ func TestGetTypeDeclaration(t *testing.T) {
 }
 
 func TestDefinitions(t *testing.T) {
-	want := map[string]map[string]*funcDecl{
+	want := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
-			"Service1": {
-				name:       "GetService1",
-				paramTypes: []*typeDecl{},
-				injectType: Singleton,
+			alias: "pkg1",
+			funcs: map[string]*funcDecl{
+				"Service1": {
+					name:       "GetService1",
+					paramTypes: []*typeDecl{},
+					injectType: Singleton,
+				},
 			},
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
-			"Service2": {
-				name: "GetService2",
-				paramTypes: []*typeDecl{
-					{
-						pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-						typeName:  "InnerService",
+			alias: "pkg2",
+			funcs: map[string]*funcDecl{
+				"Service2": {
+					name: "GetService2",
+					paramTypes: []*typeDecl{
+						{
+							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
+							typeName:  "InnerService",
+						},
+						{
+							pkgImport: "github.com/MyNihongo/inject/examples/pkg3",
+							typeName:  "Service3",
+						},
 					},
-					{
-						pkgImport: "github.com/MyNihongo/inject/examples/pkg3",
-						typeName:  "Service3",
-					},
+					injectType: Transient,
 				},
-				injectType: Transient,
-			},
-			"InnerService": {
-				name:       "GetInnerService",
-				paramTypes: []*typeDecl{},
-				injectType: Transient,
+				"InnerService": {
+					name:       "GetInnerService",
+					paramTypes: []*typeDecl{},
+					injectType: Transient,
+				},
 			},
 		},
 		"github.com/MyNihongo/inject/examples/pkg3": {
-			"Service3": {
-				name:       "GetService3",
-				paramTypes: []*typeDecl{},
-				injectType: Transient,
+			alias: "pkg3",
+			funcs: map[string]*funcDecl{
+				"Service3": {
+					name:       "GetService3",
+					paramTypes: []*typeDecl{},
+					injectType: Transient,
+				},
 			},
 		},
 	}

@@ -1,3 +1,5 @@
+github.com/MyNihongo/codegen v0.0.11 h1:0H0unCNCyQsqyZBAUSJP5ZH1aHAihbUCU9iypTuTWqc=
+github.com/MyNihongo/codegen v0.0.11/go.mod h1:1H+DDKXasO56+uZd9kdBZsZ08dVcGK/2uo6ZVqfw2Oc=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
