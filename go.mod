@@ -3,7 +3,7 @@ module github.com/MyNihongo/inject
 go 1.17
 
 require (
-	github.com/MyNihongo/codegen v0.0.11
+	github.com/MyNihongo/codegen v0.0.12
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/tools v0.1.6
 )
