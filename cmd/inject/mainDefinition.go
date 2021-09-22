@@ -26,7 +26,7 @@ type pkgFuncs struct {
 
 type funcDecl struct {
 	name       string
-	paramTypes []*typeDecl
+	paramDecls []*typeDecl
 	injectType injectType
 }
 
@@ -85,7 +85,7 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[str
 
 						pkgGrouping.funcs[returnType.typeName] = &funcDecl{
 							name:       injection.function,
-							paramTypes: paramTypes,
+							paramDecls: paramTypes,
 							injectType: injection.injectType,
 						}
 					}

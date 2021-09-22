@@ -189,7 +189,7 @@ func TestDefinitions(t *testing.T) {
 			funcs: map[string]*funcDecl{
 				"Service1": {
 					name:       "GetService1",
-					paramTypes: []*typeDecl{},
+					paramDecls: []*typeDecl{},
 					injectType: Singleton,
 				},
 			},
@@ -199,7 +199,7 @@ func TestDefinitions(t *testing.T) {
 			funcs: map[string]*funcDecl{
 				"Service2": {
 					name: "GetService2",
-					paramTypes: []*typeDecl{
+					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
 							typeName:  "InnerService",
@@ -213,7 +213,7 @@ func TestDefinitions(t *testing.T) {
 				},
 				"InnerService": {
 					name:       "GetInnerService",
-					paramTypes: []*typeDecl{},
+					paramDecls: []*typeDecl{},
 					injectType: Transient,
 				},
 			},
@@ -223,7 +223,7 @@ func TestDefinitions(t *testing.T) {
 			funcs: map[string]*funcDecl{
 				"Service3": {
 					name:       "GetService3",
-					paramTypes: []*typeDecl{},
+					paramDecls: []*typeDecl{},
 					injectType: Transient,
 				},
 			},

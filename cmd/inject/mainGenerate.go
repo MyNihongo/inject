@@ -15,7 +15,10 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 		imports.AddImportAlias(pkgImport, pkgFuncs.alias)
 
 		for returnType, funcDecl := range pkgFuncs.funcs {
+			var err error
 			var stmts []codegen.Stmt
+			usedDecls := make(map[*typeDecl]string)
+
 			if funcDecl.injectType == Singleton {
 				if isSyncAdded {
 					imports.AddImport("sync")
@@ -24,7 +27,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				varName := fmt.Sprintf("impl_%s", returnType)
 				file.DeclareVars(codegen.QualVar(varName, pkgFuncs.alias, returnType))
 
-				stmts = generateInjectionStats(pkgFuncs, funcDecl, func(v codegen.Value) codegen.Stmt {
+				stmts, err = createInjectionStmts(diGraph, pkgFuncs, funcDecl, func(v codegen.Value) codegen.Stmt {
 					return codegen.Assign(varName).Values(v)
 				})
 
@@ -33,7 +36,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 					codegen.Return(codegen.Identifier(varName)),
 				}
 			} else {
-				stmts = generateInjectionStats(pkgFuncs, funcDecl, func(v codegen.Value) codegen.Stmt {
+				stmts, err = createInjectionStmts(diGraph, pkgFuncs, funcDecl, func(v codegen.Value) codegen.Stmt {
 					return codegen.Return(v)
 				})
 			}
@@ -49,15 +52,25 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 	return file, nil
 }
 
-func generateInjectionStats(pkgFuncs *pkgFuncs, funcDecl *funcDecl, finalBlockFunc func(codegen.Value) codegen.Stmt) []codegen.Stmt {
+func createInjectionStmts(diGraph map[string]*pkgFuncs, pkgFuncs *pkgFuncs, funcDecl *funcDecl, finalBlockFunc func(codegen.Value) codegen.Stmt) ([]codegen.Stmt, error) {
 	provideFunc := codegen.QualFuncCall(pkgFuncs.alias, funcDecl.name)
 
-	if len(funcDecl.paramTypes) == 0 {
+	if len(funcDecl.paramDecls) == 0 {
 		return []codegen.Stmt{
 			finalBlockFunc(provideFunc),
-		}
+		}, nil
 	} else {
-		panic("aaa")
+		var ok bool
+		for _, paramDecl := range funcDecl.paramDecls {
+
+			if pkgFuncs, ok = diGraph[paramDecl.pkgImport]; !ok {
+				return nil, fmt.Errorf("package %s is not registered", paramDecl.pkgImport)
+			} else if funcDecl, ok = pkgFuncs.funcs[paramDecl.typeName]; !ok {
+				return nil, fmt.Errorf("type %s is not found in the package %s", paramDecl.typeName, paramDecl.pkgImport)
+			} else {
+
+			}
+		}
 	}
 }
 

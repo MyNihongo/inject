@@ -22,7 +22,7 @@ return pkg1.GetService1()
 				"Service1": {
 					name:       "GetService1",
 					injectType: Transient,
-					paramTypes: []*typeDecl{},
+					paramDecls: []*typeDecl{},
 				},
 			},
 		},
@@ -55,7 +55,7 @@ return impl_Service1
 				"Service1": {
 					name:       "GetService1",
 					injectType: Singleton,
-					paramTypes: []*typeDecl{},
+					paramDecls: []*typeDecl{},
 				},
 			},
 		},
@@ -76,7 +76,7 @@ func TestFileErrorIfParamNotFound(t *testing.T) {
 				"Service1": {
 					name:       "GetService1",
 					injectType: Singleton,
-					paramTypes: []*typeDecl{
+					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
 							typeName:  "Service2",
