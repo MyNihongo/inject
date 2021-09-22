@@ -6,6 +6,7 @@ import (
 	"github.com/MyNihongo/codegen"
 )
 
+// generateServiceProvider generates the code according to the DI graph
 func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*codegen.File, error) {
 	file := codegen.NewFile(pkgName, "my-nihongo-di")
 	imports, isSyncAdded := file.Imports(), false
@@ -37,7 +38,9 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				})
 			}
 
-			file.Func(fmt.Sprintf("Provide%s", returnType)).ReturnTypes(
+			funcName, injectName := fmt.Sprintf("Provide%s", returnType), getInjectionName(funcDecl.injectType)
+			file.CommentF("%s provides a %s instance of %s.%s", funcName, injectName, pkgImport, returnType)
+			file.Func(funcName).ReturnTypes(
 				codegen.QualReturnType(pkgFuncs.alias, returnType),
 			).Block(stmts...)
 		}
@@ -55,6 +58,17 @@ func generateInjectionStats(pkgFuncs *pkgFuncs, funcDecl *funcDecl, finalBlockFu
 		}
 	} else {
 		panic("aaa")
+	}
+}
+
+func getInjectionName(injectType injectType) string {
+	switch injectType {
+	case Singleton:
+		return "singleton"
+	case Transient:
+		return "transient"
+	default:
+		panic(fmt.Sprintf("unknown injection type: %d", injectType))
 	}
 }
 
