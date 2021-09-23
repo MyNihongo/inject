@@ -5,11 +5,15 @@ Inject is a compile-time dependency-injection library. Supported injection types
 
 The library verifies injection consistency (transient instances cannot be injected into singletons because transient will become singleton).
 ### Installing
-Install Inject by running
-```
+1. Install the CLI for code generation
+```go
 go get github.com/MyNihongo/inject/cmd/inject
 ```
-and ensuring that `$GOPATH/bin` is added to your `$PATH`.
+2. Add the library itself
+```go
+go get github.com/MyNihongo/inject
+```
+Ensure that `$GOPATH/bin` is added to your `$PATH`.
 ### Define a service collection
 1. Create a new file with the name `serviceCollection.go`. Inject will look for a file with this name;
 2. In the file define a function `BuildServiceProvider`. Inject will look for a function with this name. In this function all services should be declared.

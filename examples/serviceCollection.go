@@ -1,11 +1,13 @@
 //go:generate inject
-package examples
+package di
 
 import (
+	"github.com/MyNihongo/inject/di/pkg1"
+
+	"github.com/MyNihongo/inject/di/pkg2"
+	"github.com/MyNihongo/inject/di/pkg3"
+
 	"github.com/MyNihongo/inject"
-	"github.com/MyNihongo/inject/examples/pkg1"
-	"github.com/MyNihongo/inject/examples/pkg2"
-	"github.com/MyNihongo/inject/examples/pkg3"
 )
 
 func BuildServiceProvider() {

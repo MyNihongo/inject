@@ -1,7 +1,7 @@
 package pkg2
 
 import (
-	"github.com/MyNihongo/inject/examples/pkg3"
+	"github.com/MyNihongo/inject/di/pkg3"
 )
 
 type Service2 interface {
