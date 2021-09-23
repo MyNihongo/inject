@@ -153,7 +153,7 @@ var once_impl_Service1 sync.Once
 
 // ProvideService1 provides a singleton instance of github.com/MyNihongo/inject/examples/pkg1.Service1
 func ProvideService1() pkg1.Service1 {
-	once_impl_Service1.DoOnce(func() {
+	once_impl_Service1.Do(func() {
 		impl_Service1 = pkg1.GetService1()
 	})
 	return impl_Service1
@@ -250,7 +250,7 @@ var once_impl_Service1 sync.Once
 
 // ProvideService1 provides a singleton instance of github.com/MyNihongo/inject/examples/pkg1.Service1
 func ProvideService1() pkg1.Service1 {
-	once_impl_Service1.DoOnce(func() {
+	once_impl_Service1.Do(func() {
 		p0 := ProvideService2()
 		impl_Service1 = pkg1.GetService1(p0)
 	})
@@ -262,7 +262,7 @@ var once_impl_Service2 sync.Once
 
 // ProvideService2 provides a singleton instance of github.com/MyNihongo/inject/examples/pkg2.Service2
 func ProvideService2() pkg2.Service2 {
-	once_impl_Service2.DoOnce(func() {
+	once_impl_Service2.Do(func() {
 		impl_Service2 = pkg2.GetService2()
 	})
 	return impl_Service2
@@ -326,7 +326,7 @@ var once_impl_Service2 sync.Once
 
 // ProvideService2 provides a singleton instance of github.com/MyNihongo/inject/examples/pkg2.Service2
 func ProvideService2() pkg2.Service2 {
-	once_impl_Service2.DoOnce(func() {
+	once_impl_Service2.Do(func() {
 		impl_Service2 = pkg2.GetService2()
 	})
 	return impl_Service2

@@ -53,7 +53,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				}
 
 				stmts = []codegen.Stmt{
-					codegen.Identifier(syncVarName).Call("DoOnce").Args(codegen.Lambda().Block(stmts...)),
+					codegen.Identifier(syncVarName).Call("Do").Args(codegen.Lambda().Block(stmts...)),
 					codegen.Return(codegen.Identifier(varName)),
 				}
 			} else {
