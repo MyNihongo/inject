@@ -37,7 +37,12 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				}
 
 				varName := fmt.Sprintf("impl_%s", returnType)
-				file.DeclareVars(codegen.QualVar(varName, pkgDecl.alias, returnType))
+				syncVarName := fmt.Sprintf("once_%s", varName)
+
+				file.DeclareVars(
+					codegen.QualVar(varName, pkgDecl.alias, returnType),
+					codegen.QualVar(syncVarName, "sync", "Once"),
+				)
 
 				stmts, err = createInjectionStmts(funcData, pkgDecl, funcDecl, func(v codegen.Value) codegen.Stmt {
 					return codegen.Assign(varName).Values(v)
@@ -48,7 +53,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				}
 
 				stmts = []codegen.Stmt{
-					codegen.QualFuncCall("sync", "DoOnce").Args(codegen.Lambda().Block(stmts...)),
+					codegen.Identifier(syncVarName).Call("DoOnce").Args(codegen.Lambda().Block(stmts...)),
 					codegen.Return(codegen.Identifier(varName)),
 				}
 			} else {
