@@ -189,7 +189,7 @@ import (
 
 // ProvideService1 provides a transient instance of github.com/MyNihongo/inject/examples/pkg1.Service1
 func ProvideService1() pkg1.Service1 {
-	p0 = ProvideService2()
+	p0 := ProvideService2()
 	return pkg1.GetService1(p0)
 }
 
@@ -249,7 +249,7 @@ var impl_Service1 pkg1.Service1
 // ProvideService1 provides a singleton instance of github.com/MyNihongo/inject/examples/pkg1.Service1
 func ProvideService1() pkg1.Service1 {
 	sync.DoOnce(func() {
-		p0 = ProvideService2()
+		p0 := ProvideService2()
 		impl_Service1 = pkg1.GetService1(p0)
 	})
 	return impl_Service1
@@ -313,8 +313,8 @@ import (
 
 // ProvideService1 provides a transient instance of github.com/MyNihongo/inject/examples/pkg1.Service1
 func ProvideService1() pkg1.Service1 {
-	p0 = ProvideService3()
-	p1 = ProvideService2()
+	p0 := ProvideService3()
+	p1 := ProvideService2()
 	return pkg1.GetService1(p0, p1)
 }
 

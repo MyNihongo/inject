@@ -63,8 +63,8 @@ func ProvideInnerService() pkg2.InnerService {
 
 // ProvideService2 provides a transient instance of github.com/MyNihongo/inject/examples/pkg2.Service2
 func ProvideService2() pkg2.Service2 {
-	p0 = ProvideInnerService()
-	p1 = ProvideService3()
+	p0 := ProvideInnerService()
+	p1 := ProvideService3()
 	return pkg2.GetService2(p0, p1)
 }
 

@@ -98,7 +98,7 @@ func createInjectionStmts(funcData *injectFuncData, pkgFuncs *pkgFuncs, funcDecl
 				vals[i] = codegen.Identifier(newParam)
 
 				funcCall := codegen.FuncCall(getFuncName(paramDecl.typeName))
-				stmt := codegen.Assign(newParam).Values(funcCall)
+				stmt := codegen.Declare(newParam).Values(funcCall)
 				stmts = append(stmts, stmt)
 			}
 		}
