@@ -63,7 +63,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				}
 			}
 
-			funcName, injectName := fmt.Sprintf("Provide%s", returnType), getInjectionName(funcDecl.injectType)
+			funcName, injectName := getFuncName(returnType), getInjectionName(funcDecl.injectType)
 			file.CommentF("%s provides a %s instance of %s.%s", funcName, injectName, pkgImport, returnType)
 			file.Func(funcName).ReturnTypes(
 				codegen.QualReturnType(pkgDecl.alias, returnType),
@@ -105,21 +105,19 @@ func createInjectionStmts(funcData *injectFuncData, pkgFuncs *pkgFuncs, funcDecl
 				vals[i] = codegen.Identifier(newParam)
 				funcData.usedDecls[paramDecl] = newParam
 
-				nestedStmts, err := createInjectionStmts(funcData, nestedPkgFuncs, nestedFuncDecl, func(v codegen.Value) codegen.Stmt {
-					return codegen.Assign(newParam).Values(v)
-				})
-
-				if err != nil {
-					return nil, err
-				} else {
-					stmts = append(stmts, nestedStmts...)
-				}
+				funcCall := codegen.FuncCall(getFuncName(paramDecl.typeName))
+				stmt := codegen.Assign(newParam).Values(funcCall)
+				stmts = append(stmts, stmt)
 			}
 		}
 
-		stmts = append(stmts, provideFunc.Args(vals...))
+		stmts = append(stmts, finalBlockFunc(provideFunc.Args(vals...)))
 		return stmts, nil
 	}
+}
+
+func getFuncName(returnType string) string {
+	return fmt.Sprintf("Provide%s", returnType)
 }
 
 func getInjectionName(injectType injectType) string {
