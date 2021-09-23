@@ -8,7 +8,6 @@ import (
 
 type injectFuncData struct {
 	diGraph    map[string]*pkgFuncs
-	usedDecls  map[*typeDecl]string
 	injectType injectType
 	name       string
 }
@@ -27,7 +26,6 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 
 			funcData := &injectFuncData{
 				diGraph:    diGraph,
-				usedDecls:  make(map[*typeDecl]string),
 				injectType: funcDecl.injectType,
 				name:       funcDecl.name,
 			}
@@ -86,11 +84,6 @@ func createInjectionStmts(funcData *injectFuncData, pkgFuncs *pkgFuncs, funcDecl
 		vals := make([]codegen.Value, len(funcDecl.paramDecls))
 
 		for i, paramDecl := range funcDecl.paramDecls {
-			if usedParam, ok := funcData.usedDecls[paramDecl]; ok {
-				vals[i] = codegen.Identifier(usedParam)
-				continue
-			}
-
 			if nestedPkgFuncs, ok := funcData.diGraph[paramDecl.pkgImport]; !ok {
 				return nil, fmt.Errorf("package %s is not registered", paramDecl.pkgImport)
 			} else if nestedFuncDecl, ok := nestedPkgFuncs.funcs[paramDecl.typeName]; !ok {
@@ -101,9 +94,8 @@ func createInjectionStmts(funcData *injectFuncData, pkgFuncs *pkgFuncs, funcDecl
 					return nil, fmt.Errorf("cannot inject %s (%s) into %s (%s)", getInjectionName(nestedFuncDecl.injectType), nestedFuncDecl.name, getInjectionName(funcData.injectType), funcData.name)
 				}
 
-				newParam := fmt.Sprintf("p%d", len(funcData.usedDecls))
+				newParam := fmt.Sprintf("p%d", i)
 				vals[i] = codegen.Identifier(newParam)
-				funcData.usedDecls[paramDecl] = newParam
 
 				funcCall := codegen.FuncCall(getFuncName(paramDecl.typeName))
 				stmt := codegen.Assign(newParam).Values(funcCall)
