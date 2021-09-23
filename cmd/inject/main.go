@@ -20,6 +20,7 @@ func main() {
 		fmt.Println(err)
 	} else {
 		ctx := context.Background()
+
 		if loaded, err := loadFileContent(wd, "serviceCollection.go"); err != nil {
 			fmt.Println(err)
 		} else if diGraph, err := getDefinitions(ctx, wd, loaded); err != nil {
@@ -28,7 +29,12 @@ func main() {
 			fmt.Println(err)
 		} else {
 			savePath := filepath.Join(wd, "serviceProvider_gen.go")
-			file.Save(savePath)
+
+			if err = file.Save(savePath); err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Println("service provider has been generated")
+			}
 		}
 	}
 }
