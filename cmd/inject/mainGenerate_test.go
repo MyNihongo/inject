@@ -68,7 +68,7 @@ return impl_Service1
 	assert.Equal(t, want, got)
 }
 
-func TestFileErrorIfParamNotFound(t *testing.T) {
+func TestFileErrorIfPackageNotFound(t *testing.T) {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
@@ -90,5 +90,40 @@ func TestFileErrorIfParamNotFound(t *testing.T) {
 	file, err := generateServiceProvider("di", fixture)
 
 	assert.Nil(t, file)
-	assert.Error(t, err, "test")
+	assert.Error(t, err, "package github.com/MyNihongo/inject/examples/pkg2 is not registered")
+}
+
+func TestFileErrorIfTypeNotFound(t *testing.T) {
+	fixture := map[string]*pkgFuncs{
+		"github.com/MyNihongo/inject/examples/pkg1": {
+			alias: "pkg1",
+			funcs: map[string]*funcDecl{
+				"Service1": {
+					name:       "GetService1",
+					injectType: Singleton,
+					paramDecls: []*typeDecl{
+						{
+							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
+							typeName:  "ServiceNotExists",
+						},
+					},
+				},
+			},
+		},
+		"github.com/MyNihongo/inject/examples/pkg2": {
+			alias: "pkg2",
+			funcs: map[string]*funcDecl{
+				"Service2": {
+					name:       "GetService2",
+					injectType: Singleton,
+					paramDecls: []*typeDecl{},
+				},
+			},
+		},
+	}
+
+	file, err := generateServiceProvider("di", fixture)
+
+	assert.Nil(t, file)
+	assert.Error(t, err, "type ServiceNotExists is not found in the package github.com/MyNihongo/inject/examples/pkg2")
 }

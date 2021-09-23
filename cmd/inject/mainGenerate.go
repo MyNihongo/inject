@@ -68,7 +68,6 @@ func createInjectionStmts(diGraph map[string]*pkgFuncs, pkgFuncs *pkgFuncs, func
 			finalBlockFunc(provideFunc),
 		}, nil
 	} else {
-		var ok bool
 		stmts := make([]codegen.Stmt, 0)
 		vals := make([]codegen.Value, len(funcDecl.paramDecls))
 
@@ -84,21 +83,20 @@ func createInjectionStmts(diGraph map[string]*pkgFuncs, pkgFuncs *pkgFuncs, func
 				return nil, fmt.Errorf("type %s is not found in the package %s", paramDecl.typeName, paramDecl.pkgImport)
 			} else {
 				// TODO: verify against the base (singleton cannot inject transient)
-				nestedFuncDecl.injectType
+				// nestedFuncDecl.injectType
 
 				newParam := fmt.Sprintf("p%d", len(usedDecls))
 				vals[i] = codegen.Identifier(newParam)
 				usedDecls[paramDecl] = newParam
 
-				// TODO: assignment
-				a, err := createInjectionStmts(diGraph, nestedPkgFuncs, nestedFuncDecl, usedDecls, func(v codegen.Value) codegen.Stmt {
-
+				nestedStmts, err := createInjectionStmts(diGraph, nestedPkgFuncs, nestedFuncDecl, usedDecls, func(v codegen.Value) codegen.Stmt {
+					return codegen.Assign(newParam).Values(v)
 				})
 
 				if err != nil {
 					return nil, err
 				} else {
-					stmts = append(stmts, a...)
+					stmts = append(stmts, nestedStmts...)
 				}
 			}
 		}
