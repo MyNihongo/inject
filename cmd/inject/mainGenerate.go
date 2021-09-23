@@ -6,6 +6,13 @@ import (
 	"github.com/MyNihongo/codegen"
 )
 
+type injectFuncData struct {
+	diGraph    map[string]*pkgFuncs
+	usedDecls  map[*typeDecl]string
+	injectType injectType
+	name       string
+}
+
 // generateServiceProvider generates the code according to the DI graph
 func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*codegen.File, error) {
 	file := codegen.NewFile(pkgName, "my-nihongo-di")
@@ -17,17 +24,24 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 		for returnType, funcDecl := range pkgDecl.funcs {
 			var err error
 			var stmts []codegen.Stmt
-			usedDecls := make(map[*typeDecl]string)
+
+			funcData := &injectFuncData{
+				diGraph:    diGraph,
+				usedDecls:  make(map[*typeDecl]string),
+				injectType: funcDecl.injectType,
+				name:       funcDecl.name,
+			}
 
 			if funcDecl.injectType == Singleton {
-				if isSyncAdded {
+				if !isSyncAdded {
 					imports.AddImport("sync")
+					isSyncAdded = true
 				}
 
 				varName := fmt.Sprintf("impl_%s", returnType)
 				file.DeclareVars(codegen.QualVar(varName, pkgDecl.alias, returnType))
 
-				stmts, err = createInjectionStmts(diGraph, pkgDecl, funcDecl, usedDecls, func(v codegen.Value) codegen.Stmt {
+				stmts, err = createInjectionStmts(funcData, pkgDecl, funcDecl, func(v codegen.Value) codegen.Stmt {
 					return codegen.Assign(varName).Values(v)
 				})
 
@@ -40,7 +54,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 					codegen.Return(codegen.Identifier(varName)),
 				}
 			} else {
-				stmts, err = createInjectionStmts(diGraph, pkgDecl, funcDecl, usedDecls, func(v codegen.Value) codegen.Stmt {
+				stmts, err = createInjectionStmts(funcData, pkgDecl, funcDecl, func(v codegen.Value) codegen.Stmt {
 					return codegen.Return(v)
 				})
 
@@ -60,7 +74,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 	return file, nil
 }
 
-func createInjectionStmts(diGraph map[string]*pkgFuncs, pkgFuncs *pkgFuncs, funcDecl *funcDecl, usedDecls map[*typeDecl]string, finalBlockFunc func(codegen.Value) codegen.Stmt) ([]codegen.Stmt, error) {
+func createInjectionStmts(funcData *injectFuncData, pkgFuncs *pkgFuncs, funcDecl *funcDecl, finalBlockFunc func(codegen.Value) codegen.Stmt) ([]codegen.Stmt, error) {
 	provideFunc := codegen.QualFuncCall(pkgFuncs.alias, funcDecl.name)
 
 	if len(funcDecl.paramDecls) == 0 {
@@ -72,24 +86,26 @@ func createInjectionStmts(diGraph map[string]*pkgFuncs, pkgFuncs *pkgFuncs, func
 		vals := make([]codegen.Value, len(funcDecl.paramDecls))
 
 		for i, paramDecl := range funcDecl.paramDecls {
-			if usedParam, ok := usedDecls[paramDecl]; ok {
+			if usedParam, ok := funcData.usedDecls[paramDecl]; ok {
 				vals[i] = codegen.Identifier(usedParam)
 				continue
 			}
 
-			if nestedPkgFuncs, ok := diGraph[paramDecl.pkgImport]; !ok {
+			if nestedPkgFuncs, ok := funcData.diGraph[paramDecl.pkgImport]; !ok {
 				return nil, fmt.Errorf("package %s is not registered", paramDecl.pkgImport)
 			} else if nestedFuncDecl, ok := nestedPkgFuncs.funcs[paramDecl.typeName]; !ok {
 				return nil, fmt.Errorf("type %s is not found in the package %s", paramDecl.typeName, paramDecl.pkgImport)
 			} else {
-				// TODO: verify against the base (singleton cannot inject transient)
-				// nestedFuncDecl.injectType
+				// verify inconsistent injection types (transient into singleton)
+				if nestedFuncDecl.injectType > funcData.injectType {
+					return nil, fmt.Errorf("cannot inject %s (%s) into %s (%s)", getInjectionName(nestedFuncDecl.injectType), nestedFuncDecl.name, getInjectionName(funcData.injectType), funcData.name)
+				}
 
-				newParam := fmt.Sprintf("p%d", len(usedDecls))
+				newParam := fmt.Sprintf("p%d", len(funcData.usedDecls))
 				vals[i] = codegen.Identifier(newParam)
-				usedDecls[paramDecl] = newParam
+				funcData.usedDecls[paramDecl] = newParam
 
-				nestedStmts, err := createInjectionStmts(diGraph, nestedPkgFuncs, nestedFuncDecl, usedDecls, func(v codegen.Value) codegen.Stmt {
+				nestedStmts, err := createInjectionStmts(funcData, nestedPkgFuncs, nestedFuncDecl, func(v codegen.Value) codegen.Stmt {
 					return codegen.Assign(newParam).Values(v)
 				})
 

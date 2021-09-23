@@ -74,7 +74,7 @@ func TestGroupingSamePackageMultiple(t *testing.T) {
 	got, err := getInjectionGrouping(fixture)
 
 	assert.Nil(t, err)
-	assert.Equal(t, want, got)
+	assert.EqualValues(t, want, got)
 }
 
 func TestGroupingAnotherPackageOne(t *testing.T) {
@@ -103,7 +103,7 @@ func TestGroupingAnotherPackageOne(t *testing.T) {
 	got, err := getInjectionGrouping(fixture)
 
 	assert.Nil(t, err)
-	assert.Equal(t, want, got)
+	assert.EqualValues(t, want, got)
 }
 
 func TestGroupingAnotherPackageMultiple(t *testing.T) {
@@ -153,7 +153,7 @@ func TestGroupingAnotherPackageMultiple(t *testing.T) {
 	got, err := getInjectionGrouping(fixture)
 
 	assert.Nil(t, err)
-	assert.Equal(t, want, got)
+	assert.EqualValues(t, want, got)
 }
 
 func TestGroupingErrorIfNoImport(t *testing.T) {
@@ -236,5 +236,5 @@ func TestDefinitions(t *testing.T) {
 	got, err := getDefinitions(ctx, wd, fixture)
 
 	assert.Nil(t, err)
-	assert.Equal(t, want, got)
+	assert.EqualValues(t, want, got)
 }
