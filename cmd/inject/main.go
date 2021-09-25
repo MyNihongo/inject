@@ -20,21 +20,24 @@ func main() {
 		fmt.Println(err)
 	} else {
 		ctx := context.Background()
+		execute(ctx, wd)
+	}
+}
 
-		if loaded, err := loadFileContent(wd, "serviceCollection.go"); err != nil {
-			fmt.Println(err)
-		} else if diGraph, err := getDefinitions(ctx, wd, loaded); err != nil {
-			fmt.Println(err)
-		} else if file, err := generateServiceProvider(loaded.pkgName, diGraph); err != nil {
+func execute(ctx context.Context, wd string) {
+	if loaded, err := loadFileContent(wd, "serviceCollection.go"); err != nil {
+		fmt.Println(err)
+	} else if diGraph, err := getDefinitions(ctx, wd, loaded); err != nil {
+		fmt.Println(err)
+	} else if file, err := generateServiceProvider(loaded.pkgName, diGraph); err != nil {
+		fmt.Println(err)
+	} else {
+		savePath := filepath.Join(wd, "serviceProvider_gen.go")
+
+		if err = file.Save(savePath); err != nil {
 			fmt.Println(err)
 		} else {
-			savePath := filepath.Join(wd, "serviceProvider_gen.go")
-
-			if err = file.Save(savePath); err != nil {
-				fmt.Println(err)
-			} else {
-				fmt.Println("service provider has been generated")
-			}
+			fmt.Println("service provider has been generated")
 		}
 	}
 }

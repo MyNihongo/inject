@@ -158,8 +158,15 @@ func getTypeDeclaration(t types.Type) *typeDecl {
 func getTypeDeclarationString(strVal string) *typeDecl {
 	typeSeparator := strings.LastIndexByte(strVal, '.')
 
+	pkgImport, typeName := strVal[:typeSeparator], strVal[typeSeparator+1:]
+
+	if strings.HasPrefix(pkgImport, "*") {
+		pkgImport = pkgImport[1:]
+		typeName = "*" + typeName
+	}
+
 	return &typeDecl{
-		pkgImport: strVal[:typeSeparator],
-		typeName:  strVal[typeSeparator+1:],
+		pkgImport: pkgImport,
+		typeName:  typeName,
 	}
 }

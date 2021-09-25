@@ -182,6 +182,17 @@ func TestGetTypeDeclaration(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
+func TestGetTypeDeclarationPointer(t *testing.T) {
+	want := &typeDecl{
+		pkgImport: "github.com/MyNihongo/inject/examples/pkg1",
+		typeName:  "*Service1",
+	}
+
+	got := getTypeDeclarationString("*github.com/MyNihongo/inject/examples/pkg1.Service1")
+
+	assert.Equal(t, want, got)
+}
+
 func TestDefinitions(t *testing.T) {
 	want := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
