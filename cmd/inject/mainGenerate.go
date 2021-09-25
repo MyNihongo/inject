@@ -67,9 +67,9 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 			}
 
 			funcName, injectName := getFuncName(returnType.typeName), getInjectionName(funcDecl.injectType)
-			returnName := getReturnName(&returnType)
+			returnName := getReturnName(pkgImport, &returnType)
 
-			file.CommentF("%s provides a %s instance of %s.%s", funcName, injectName, pkgImport, returnName)
+			file.CommentF("%s provides a %s instance of %s", funcName, injectName, returnName)
 			file.Func(funcName).ReturnTypes(
 				codegen.QualReturnType(pkgDecl.alias, returnType.typeName).SetIsPointer(returnType.isPointer),
 			).Block(stmts...)
@@ -130,8 +130,9 @@ func getInjectionName(injectType injectType) string {
 	}
 }
 
-func getReturnName(typeName *typeNameDecl) string {
-	name := typeName.typeName
+func getReturnName(pkgImport string, typeName *typeNameDecl) string {
+	name := fmt.Sprintf("%s.%s", pkgImport, typeName.typeName)
+
 	if typeName.isPointer {
 		name = "*" + name
 	}
