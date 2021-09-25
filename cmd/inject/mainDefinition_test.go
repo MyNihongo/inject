@@ -18,7 +18,7 @@ func getExamplesWd() string {
 	return filepath.Join(wd[:dirIndex], "examples")
 }
 
-func TestGroupingSamePackageOne(t *testing.T) {
+func TestDefinitionSamePackageOne(t *testing.T) {
 	want := map[string]*pkgInjections{
 		"": {
 			alias: "",
@@ -45,7 +45,7 @@ func TestGroupingSamePackageOne(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-func TestGroupingSamePackageMultiple(t *testing.T) {
+func TestDefinitionSamePackageMultiple(t *testing.T) {
 	want := map[string]*pkgInjections{
 		"": {
 			alias: "",
@@ -77,7 +77,7 @@ func TestGroupingSamePackageMultiple(t *testing.T) {
 	assert.EqualValues(t, want, got)
 }
 
-func TestGroupingAnotherPackageOne(t *testing.T) {
+func TestDefinitionAnotherPackageOne(t *testing.T) {
 	want := map[string]*pkgInjections{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
@@ -106,7 +106,7 @@ func TestGroupingAnotherPackageOne(t *testing.T) {
 	assert.EqualValues(t, want, got)
 }
 
-func TestGroupingAnotherPackageMultiple(t *testing.T) {
+func TestDefinitionAnotherPackageMultiple(t *testing.T) {
 	want := map[string]*pkgInjections{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "my_pkg1",
@@ -156,7 +156,7 @@ func TestGroupingAnotherPackageMultiple(t *testing.T) {
 	assert.EqualValues(t, want, got)
 }
 
-func TestGroupingErrorIfNoImport(t *testing.T) {
+func TestDefinitionErrorIfNoImport(t *testing.T) {
 	fixture := &loadResult{
 		pkgName: "di",
 		imports: map[string]string{},
@@ -174,7 +174,10 @@ func TestGroupingErrorIfNoImport(t *testing.T) {
 func TestGetTypeDeclaration(t *testing.T) {
 	want := &typeDecl{
 		pkgImport: "github.com/MyNihongo/inject/examples/pkg1",
-		typeName:  "Service1",
+		typeName: typeNameDecl{
+			typeName:  "Service1",
+			isPointer: false,
+		},
 	}
 
 	got := getTypeDeclarationString("github.com/MyNihongo/inject/examples/pkg1.Service1")
@@ -185,7 +188,10 @@ func TestGetTypeDeclaration(t *testing.T) {
 func TestGetTypeDeclarationPointer(t *testing.T) {
 	want := &typeDecl{
 		pkgImport: "github.com/MyNihongo/inject/examples/pkg1",
-		typeName:  "*Service1",
+		typeName: typeNameDecl{
+			typeName:  "Service1",
+			isPointer: true,
+		},
 	}
 
 	got := getTypeDeclarationString("*github.com/MyNihongo/inject/examples/pkg1.Service1")
@@ -197,8 +203,8 @@ func TestDefinitions(t *testing.T) {
 	want := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				typeNameDecl{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					paramDecls: []*typeDecl{},
 					injectType: Singleton,
@@ -207,22 +213,28 @@ func TestDefinitions(t *testing.T) {
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
 			alias: "pkg2",
-			funcs: map[string]*funcDecl{
-				"Service2": {
+			funcs: map[typeNameDecl]*funcDecl{
+				typeNameDecl{typeName: "Service2", isPointer: false}: {
 					name: "GetService2",
 					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-							typeName:  "InnerService",
+							typeName: typeNameDecl{
+								typeName:  "InnerService",
+								isPointer: false,
+							},
 						},
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg3",
-							typeName:  "Service3",
+							typeName: typeNameDecl{
+								typeName:  "Service3",
+								isPointer: false,
+							},
 						},
 					},
 					injectType: Transient,
 				},
-				"InnerService": {
+				typeNameDecl{typeName: "InnerService", isPointer: false}: {
 					name:       "GetInnerService",
 					paramDecls: []*typeDecl{},
 					injectType: Transient,
@@ -231,8 +243,8 @@ func TestDefinitions(t *testing.T) {
 		},
 		"github.com/MyNihongo/inject/examples/pkg3": {
 			alias: "pkg3",
-			funcs: map[string]*funcDecl{
-				"Service3": {
+			funcs: map[typeNameDecl]*funcDecl{
+				typeNameDecl{typeName: "Service3", isPointer: false}: {
 					name:       "GetService3",
 					paramDecls: []*typeDecl{},
 					injectType: Transient,

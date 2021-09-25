@@ -40,7 +40,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				syncVarName := fmt.Sprintf("once_%s", varName)
 
 				file.DeclareVars(
-					codegen.QualVar(varName, pkgDecl.alias, returnType),
+					codegen.QualVar(varName, pkgDecl.alias, returnType.typeName).SetIsPointer(returnType.isPointer),
 					codegen.QualVar(syncVarName, "sync", "Once"),
 				)
 

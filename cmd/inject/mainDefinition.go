@@ -21,7 +21,7 @@ type pkgInjections struct {
 
 type pkgFuncs struct {
 	alias string
-	funcs map[string]*funcDecl
+	funcs map[typeNameDecl]*funcDecl
 }
 
 type funcDecl struct {
@@ -32,7 +32,12 @@ type funcDecl struct {
 
 type typeDecl struct {
 	pkgImport string
+	typeName  typeNameDecl
+}
+
+type typeNameDecl struct {
 	typeName  string
+	isPointer bool
 }
 
 func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[string]*pkgFuncs, error) {
@@ -66,7 +71,7 @@ func getDefinitions(ctx context.Context, wd string, loaded *loadResult) (map[str
 						if pkgGrouping, ok = diDecl[returnType.pkgImport]; !ok {
 							pkgGrouping = &pkgFuncs{
 								alias: pkgInjections.alias,
-								funcs: make(map[string]*funcDecl, 1),
+								funcs: make(map[typeNameDecl]*funcDecl, 1),
 							}
 							diDecl[returnType.pkgImport] = pkgGrouping
 						}
@@ -157,16 +162,19 @@ func getTypeDeclaration(t types.Type) *typeDecl {
 
 func getTypeDeclarationString(strVal string) *typeDecl {
 	typeSeparator := strings.LastIndexByte(strVal, '.')
+	pkgImport := strVal[:typeSeparator]
 
-	pkgImport, typeName := strVal[:typeSeparator], strVal[typeSeparator+1:]
-
+	var isPointer bool
 	if strings.HasPrefix(pkgImport, "*") {
 		pkgImport = pkgImport[1:]
-		typeName = "*" + typeName
+		isPointer = true
 	}
 
 	return &typeDecl{
 		pkgImport: pkgImport,
-		typeName:  typeName,
+		typeName: typeNameDecl{
+			typeName:  strVal[typeSeparator+1:],
+			isPointer: isPointer,
+		},
 	}
 }
