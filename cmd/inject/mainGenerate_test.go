@@ -17,14 +17,17 @@ func TestFileErrorIfPackageNotFound(t *testing.T) {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2", // pkg2 is not registered
-							typeName:  "Service2",
+							typeName: typeNameDecl{
+								typeName:  "Service2",
+								isPointer: false,
+							},
 						},
 					},
 				},
@@ -42,14 +45,17 @@ func TestFileErrorIfTypeNotFound(t *testing.T) {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-							typeName:  "ServiceNotExists", // not present in pkg2
+							typeName: typeNameDecl{
+								typeName:  "ServiceNotExists", // not present in pkg2
+								isPointer: false,
+							},
 						},
 					},
 				},
@@ -57,8 +63,8 @@ func TestFileErrorIfTypeNotFound(t *testing.T) {
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
 			alias: "pkg2",
-			funcs: map[string]*funcDecl{
-				"Service2": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service2", isPointer: false}: {
 					name:       "GetService2",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{},
@@ -77,14 +83,17 @@ func TestFileErrorInconsistentInjection(t *testing.T) {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-							typeName:  "Service2",
+							typeName: typeNameDecl{
+								typeName:  "Service2",
+								isPointer: false,
+							},
 						},
 					},
 				},
@@ -92,8 +101,8 @@ func TestFileErrorInconsistentInjection(t *testing.T) {
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
 			alias: "pkg2",
-			funcs: map[string]*funcDecl{
-				"Service2": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service2", isPointer: false}: {
 					name:       "GetService2",
 					injectType: Transient, // cannot inject into Singleton
 					paramDecls: []*typeDecl{},
@@ -152,8 +161,8 @@ func ProvideService1() pkg1.Service1 {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Transient,
 					paramDecls: []*typeDecl{},
@@ -192,8 +201,8 @@ func ProvideService1() pkg1.Service1 {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{},
@@ -233,14 +242,17 @@ func ProvideService2() pkg2.Service2 {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Transient,
 					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-							typeName:  "Service2",
+							typeName: typeNameDecl{
+								typeName:  "Service2",
+								isPointer: false,
+							},
 						},
 					},
 				},
@@ -248,8 +260,8 @@ func ProvideService2() pkg2.Service2 {
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
 			alias: "pkg2",
-			funcs: map[string]*funcDecl{
-				"Service2": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service2", isPointer: false}: {
 					name:       "GetService2",
 					injectType: Transient,
 					paramDecls: []*typeDecl{},
@@ -302,14 +314,17 @@ func ProvideService2() pkg2.Service2 {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-							typeName:  "Service2",
+							typeName: typeNameDecl{
+								typeName:  "Service2",
+								isPointer: false,
+							},
 						},
 					},
 				},
@@ -317,8 +332,8 @@ func ProvideService2() pkg2.Service2 {
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
 			alias: "pkg2",
-			funcs: map[string]*funcDecl{
-				"Service2": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service2", isPointer: false}: {
 					name:       "GetService2",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{},
@@ -371,18 +386,24 @@ func ProvideService3() pkg2.Service3 {
 	fixture := map[string]*pkgFuncs{
 		"github.com/MyNihongo/inject/examples/pkg1": {
 			alias: "pkg1",
-			funcs: map[string]*funcDecl{
-				"Service1": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					injectType: Transient,
 					paramDecls: []*typeDecl{
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-							typeName:  "Service3",
+							typeName: typeNameDecl{
+								typeName:  "Service3",
+								isPointer: false,
+							},
 						},
 						{
 							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
-							typeName:  "Service2",
+							typeName: typeNameDecl{
+								typeName:  "Service2",
+								isPointer: false,
+							},
 						},
 					},
 				},
@@ -390,13 +411,13 @@ func ProvideService3() pkg2.Service3 {
 		},
 		"github.com/MyNihongo/inject/examples/pkg2": {
 			alias: "pkg2",
-			funcs: map[string]*funcDecl{
-				"Service2": {
+			funcs: map[typeNameDecl]*funcDecl{
+				{typeName: "Service2", isPointer: false}: {
 					name:       "GetService2",
 					injectType: Singleton,
 					paramDecls: []*typeDecl{},
 				},
-				"Service3": {
+				{typeName: "Service3", isPointer: false}: {
 					name:       "GetService3",
 					injectType: Transient,
 					paramDecls: []*typeDecl{},

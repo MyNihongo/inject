@@ -36,7 +36,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 					isSyncAdded = true
 				}
 
-				varName := fmt.Sprintf("impl_%s", returnType)
+				varName := fmt.Sprintf("impl_%s", returnType.typeName)
 				syncVarName := fmt.Sprintf("once_%s", varName)
 
 				file.DeclareVars(
@@ -66,10 +66,12 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 				}
 			}
 
-			funcName, injectName := getFuncName(returnType), getInjectionName(funcDecl.injectType)
-			file.CommentF("%s provides a %s instance of %s.%s", funcName, injectName, pkgImport, returnType)
+			funcName, injectName := getFuncName(returnType.typeName), getInjectionName(funcDecl.injectType)
+			returnName := getReturnName(&returnType)
+
+			file.CommentF("%s provides a %s instance of %s.%s", funcName, injectName, pkgImport, returnName)
 			file.Func(funcName).ReturnTypes(
-				codegen.QualReturnType(pkgDecl.alias, returnType),
+				codegen.QualReturnType(pkgDecl.alias, returnType.typeName).SetIsPointer(returnType.isPointer),
 			).Block(stmts...)
 		}
 	}
@@ -92,7 +94,7 @@ func createInjectionStmts(funcData *injectFuncData, pkgFuncs *pkgFuncs, funcDecl
 			if nestedPkgFuncs, ok := funcData.diGraph[paramDecl.pkgImport]; !ok {
 				return nil, fmt.Errorf("package %s is not registered", paramDecl.pkgImport)
 			} else if nestedFuncDecl, ok := nestedPkgFuncs.funcs[paramDecl.typeName]; !ok {
-				return nil, fmt.Errorf("type %s is not found in the package %s", paramDecl.typeName, paramDecl.pkgImport)
+				return nil, fmt.Errorf("type %s is not found in the package %s", paramDecl.typeName.typeName, paramDecl.pkgImport)
 			} else {
 				// verify inconsistent injection types (transient into singleton)
 				if nestedFuncDecl.injectType > funcData.injectType {
@@ -102,7 +104,7 @@ func createInjectionStmts(funcData *injectFuncData, pkgFuncs *pkgFuncs, funcDecl
 				newParam := fmt.Sprintf("p%d", i)
 				vals[i] = codegen.Identifier(newParam)
 
-				funcCall := codegen.FuncCall(getFuncName(paramDecl.typeName))
+				funcCall := codegen.FuncCall(getFuncName(paramDecl.typeName.typeName))
 				stmt := codegen.Declare(newParam).Values(funcCall)
 				stmts = append(stmts, stmt)
 			}
@@ -126,4 +128,13 @@ func getInjectionName(injectType injectType) string {
 	default:
 		panic(fmt.Sprintf("unknown injection type: %d", injectType))
 	}
+}
+
+func getReturnName(typeName *typeNameDecl) string {
+	name := typeName.typeName
+	if typeName.isPointer {
+		name = "*" + name
+	}
+
+	return name
 }

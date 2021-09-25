@@ -42,7 +42,7 @@ func TestDefinitionSamePackageOne(t *testing.T) {
 	got, err := getInjectionGrouping(fixture)
 
 	assert.Nil(t, err)
-	assert.Equal(t, want, got)
+	assert.EqualValues(t, want, got)
 }
 
 func TestDefinitionSamePackageMultiple(t *testing.T) {
@@ -201,31 +201,31 @@ func TestGetTypeDeclarationPointer(t *testing.T) {
 
 func TestDefinitions(t *testing.T) {
 	want := map[string]*pkgFuncs{
-		"github.com/MyNihongo/inject/examples/pkg1": {
+		"github.com/MyNihongo/inject/di/pkg1": {
 			alias: "pkg1",
 			funcs: map[typeNameDecl]*funcDecl{
-				typeNameDecl{typeName: "Service1", isPointer: false}: {
+				{typeName: "Service1", isPointer: false}: {
 					name:       "GetService1",
 					paramDecls: []*typeDecl{},
 					injectType: Singleton,
 				},
 			},
 		},
-		"github.com/MyNihongo/inject/examples/pkg2": {
+		"github.com/MyNihongo/inject/di/pkg2": {
 			alias: "pkg2",
 			funcs: map[typeNameDecl]*funcDecl{
-				typeNameDecl{typeName: "Service2", isPointer: false}: {
+				{typeName: "Service2", isPointer: false}: {
 					name: "GetService2",
 					paramDecls: []*typeDecl{
 						{
-							pkgImport: "github.com/MyNihongo/inject/examples/pkg2",
+							pkgImport: "github.com/MyNihongo/inject/di/pkg2",
 							typeName: typeNameDecl{
 								typeName:  "InnerService",
 								isPointer: false,
 							},
 						},
 						{
-							pkgImport: "github.com/MyNihongo/inject/examples/pkg3",
+							pkgImport: "github.com/MyNihongo/inject/di/pkg3",
 							typeName: typeNameDecl{
 								typeName:  "Service3",
 								isPointer: false,
@@ -234,17 +234,17 @@ func TestDefinitions(t *testing.T) {
 					},
 					injectType: Transient,
 				},
-				typeNameDecl{typeName: "InnerService", isPointer: false}: {
+				{typeName: "InnerService", isPointer: false}: {
 					name:       "GetInnerService",
 					paramDecls: []*typeDecl{},
 					injectType: Transient,
 				},
 			},
 		},
-		"github.com/MyNihongo/inject/examples/pkg3": {
+		"github.com/MyNihongo/inject/di/pkg3": {
 			alias: "pkg3",
 			funcs: map[typeNameDecl]*funcDecl{
-				typeNameDecl{typeName: "Service3", isPointer: false}: {
+				{typeName: "Service3", isPointer: false}: {
 					name:       "GetService3",
 					paramDecls: []*typeDecl{},
 					injectType: Transient,
