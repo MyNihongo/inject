@@ -2,6 +2,8 @@ github.com/MyNihongo/codegen v0.0.12 h1:J8ub2QtrUg+l7/wahoZTooqkK0hZaEi8WjMFsZYc
 github.com/MyNihongo/codegen v0.0.12/go.mod h1:1H+DDKXasO56+uZd9kdBZsZ08dVcGK/2uo6ZVqfw2Oc=
 github.com/MyNihongo/codegen v0.0.13 h1:kog6pxsEZpbQ/cVcPEGXL8Zf5r8FW6TzsmE8UbT5Pyw=
 github.com/MyNihongo/codegen v0.0.13/go.mod h1:1H+DDKXasO56+uZd9kdBZsZ08dVcGK/2uo6ZVqfw2Oc=
+github.com/MyNihongo/codegen v0.0.15 h1:CtCkWQyOnEzEZyIKU+7WwkmiC5pLKJdm0cLFFM4LC24=
+github.com/MyNihongo/codegen v0.0.15/go.mod h1:1H+DDKXasO56+uZd9kdBZsZ08dVcGK/2uo6ZVqfw2Oc=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
