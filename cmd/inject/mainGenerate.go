@@ -71,7 +71,7 @@ func generateServiceProvider(pkgName string, diGraph map[string]*pkgFuncs) (*cod
 
 			file.CommentF("%s provides a %s instance of %s", funcName, injectName, returnName)
 			file.Func(funcName).ReturnTypes(
-				codegen.QualReturnType(pkgDecl.alias, returnType.typeName).SetIsPointer(returnType.isPointer),
+				codegen.QualType(pkgDecl.alias, returnType.typeName).SetIsPointer(returnType.isPointer),
 			).Block(stmts...)
 		}
 	}
