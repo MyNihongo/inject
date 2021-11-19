@@ -1,5 +1,5 @@
-github.com/MyNihongo/codegen v0.0.19 h1:DQJSJXFEHFvosAiHuqaqF5aY72e1jgVfmCBFNnf27fE=
-github.com/MyNihongo/codegen v0.0.19/go.mod h1:1H+DDKXasO56+uZd9kdBZsZ08dVcGK/2uo6ZVqfw2Oc=
+github.com/MyNihongo/codegen v0.0.25 h1:ow0bxdR/0Ucw/wM7DdaURVEtgIZFQ2xIy11YdYKht54=
+github.com/MyNihongo/codegen v0.0.25/go.mod h1:1H+DDKXasO56+uZd9kdBZsZ08dVcGK/2uo6ZVqfw2Oc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
